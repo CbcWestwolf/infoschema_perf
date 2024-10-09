@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"infoschema_perf/cmd/util"
 	"math/rand"
-	"os"
-	"sync"
 
 	"github.com/spf13/cobra"
 )
@@ -61,38 +59,25 @@ func init() {
 	DbCmd.AddCommand(queryCmds...)
 }
 
-func prepareOrCleanDBs(sql string) {
-	var wg sync.WaitGroup
-	db, conns, chs, err := util.GetMultiConnsForExec(&wg)
-	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
-	}
-	defer func() {
-		for _, conn := range conns {
-			conn.Close()
-		}
-		db.Close()
-	}()
+func prepare(_ *cobra.Command, _ []string) {
+	chs, clean := util.GetMultiConnsForExec()
+	defer clean()
 
 	for i := 0; i < util.DatabaseCnt; i++ {
-		sql := fmt.Sprintf(sql, util.DatabaseNamePrefix, i)
+		sql := fmt.Sprintf(prepareDbSQL, util.DatabaseNamePrefix, i)
 		chs[i%util.Thread] <- sql
 	}
-	for i := 0; i < util.Thread; i++ {
-		close(chs[i])
-	}
-
-	wg.Wait()
-}
-
-func prepare(_ *cobra.Command, _ []string) {
-	prepareOrCleanDBs(prepareDbSQL)
 	fmt.Println("Finish prepare databases")
 }
 
 func clean(_ *cobra.Command, _ []string) {
-	prepareOrCleanDBs(cleanDbSQL)
+	chs, clean := util.GetMultiConnsForExec()
+	defer clean()
+
+	for i := 0; i < util.DatabaseCnt; i++ {
+		sql := fmt.Sprintf(cleanDbSQL, util.DatabaseNamePrefix, i)
+		chs[i%util.Thread] <- sql
+	}
 	fmt.Println("Finish clean databases")
 }
 

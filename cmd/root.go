@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"infoschema_perf/cmd/db"
+	"infoschema_perf/cmd/table"
 	"infoschema_perf/cmd/util"
 
 	"github.com/spf13/cobra"
@@ -34,4 +35,5 @@ func init() {
 	init_flags()
 
 	rootCmd.AddCommand(db.DbCmd)
+	rootCmd.AddCommand(table.TableCmd)
 }

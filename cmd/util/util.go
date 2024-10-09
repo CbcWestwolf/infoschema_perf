@@ -41,15 +41,15 @@ func openMultiConns(connNum int, host string, port int, user string, db_name str
 }
 
 // Remember to close the returning db, conns and chs
-func GetMultiConnsForExec(wg *sync.WaitGroup) (db *sql.DB, conns []*sql.Conn, chs []chan string, err error) {
-	db, conns, err = openMultiConns(Thread, Host, Port, User, "")
+func GetMultiConnsForExec() (chs []chan string, waitAndClose func()) {
+	var wg sync.WaitGroup
+	db, conns, err := openMultiConns(Thread, Host, Port, User, "")
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 
 	chs = make([]chan string, Thread)
-
 	for i := 0; i < Thread; i++ {
 		chs[i] = make(chan string)
 		wg.Add(1)
@@ -64,11 +64,23 @@ func GetMultiConnsForExec(wg *sync.WaitGroup) (db *sql.DB, conns []*sql.Conn, ch
 		}(i)
 	}
 
+	waitAndClose = func() {
+		for i := 0; i < Thread; i++ {
+			close(chs[i])
+		}
+		wg.Wait()
+
+		for _, conn := range conns {
+			conn.Close()
+		}
+		db.Close()
+	}
+
 	return
 }
 
-func getMultiConnsForQuery(wg *sync.WaitGroup, ctx *context.Context, c *atomic.Uint64) (db *sql.DB, conns []*sql.Conn, chs []chan string, err error) {
-	db, conns, err = openMultiConns(Thread, Host, Port, User, "")
+func getMultiConnsForQuery(wg *sync.WaitGroup, ctx *context.Context, c *atomic.Uint64) (chs []chan string, waitAndClose func()) {
+	db, conns, err := openMultiConns(Thread, Host, Port, User, "")
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
@@ -105,6 +117,12 @@ func getMultiConnsForQuery(wg *sync.WaitGroup, ctx *context.Context, c *atomic.U
 			}
 		}(i)
 	}
+	waitAndClose = func() {
+		for _, conn := range conns {
+			conn.Close()
+		}
+		db.Close()
+	}
 
 	return
 }
@@ -118,7 +136,7 @@ func QuerySQL(getSQL func() string) {
 	if TimeStr != "" {
 		t, err := time.ParseDuration(TimeStr)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Fail to parse %s", TimeStr)
+			fmt.Fprintf(os.Stderr, "Fail to parse '%s' as time limitation. Execute with no time limitation", TimeStr)
 		} else {
 			var cancel context.CancelFunc
 			fmt.Printf("Execute for %s\n", t.String())
@@ -126,20 +144,11 @@ func QuerySQL(getSQL func() string) {
 			defer cancel()
 		}
 	} else {
-		fmt.Println("Execute with no time limit")
+		fmt.Println("Execute with no time limitation")
 	}
 
-	db, conns, chs, err := getMultiConnsForQuery(&wg, &ctx, &counter)
-	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
-	}
-	defer func() {
-		for _, conn := range conns {
-			conn.Close()
-		}
-		db.Close()
-	}()
+	chs, clean := getMultiConnsForQuery(&wg, &ctx, &counter)
+	defer clean()
 
 	startTime := time.Now()
 	tick := time.NewTicker(Tick)

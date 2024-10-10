@@ -18,6 +18,7 @@ var (
 
 	IndexCnt        int
 	IndexNamePrefix string
+	UniqueCnt       int
 
 	Stdout  bool
 	TimeStr string

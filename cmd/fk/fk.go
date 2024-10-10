@@ -32,6 +32,11 @@ var (
 			Short: queryFkSQL1,
 			Run:   query1,
 		},
+		{
+			Use:   "q2",
+			Short: queryFkSQL2,
+			Run:   query2,
+		},
 	}
 )
 
@@ -40,6 +45,7 @@ const (
 	prepareRefferedTableSQL = "CREATE TABLE IF NOT EXISTS %s.%s (id int primary key, name varchar(255));"
 	prepareFkTableSQL       = "CREATE TABLE IF NOT EXISTS %s.%s (id int primary key, f_id int, foreign key fk_id (f_id) references %s(id));"
 	queryFkSQL1             = "SELECT * FROM information_schema.key_column_usage WHERE table_schema = '%s' AND table_name = '%s' AND referenced_table_schema IS NOT NULL;"
+	queryFkSQL2             = "SELECT * FROM information_schema.table_constraints WHERE table_schema = '%s' AND table_name = '%s' AND constraint_type = 'FOREIGN KEY';"
 )
 
 func init_flags() {
@@ -80,4 +86,13 @@ func query1(_ *cobra.Command, _ []string) {
 		)
 	})
 	fmt.Printf("Finish query '%s'", queryFkSQL1)
+}
+
+func query2(_ *cobra.Command, _ []string) {
+	util.QuerySQL(func() string {
+		return fmt.Sprintf(queryFkSQL2, fmt.Sprintf("%s_%d", util.DatabaseNamePrefix, rand.Intn(util.DatabaseCnt)),
+			fmt.Sprintf("%s_%d", util.TableNamePrefix, rand.Intn(util.TableCnt)),
+		)
+	})
+	fmt.Printf("Finish query '%s'", queryFkSQL2)
 }

@@ -59,6 +59,16 @@ var (
 			Short: queryIndexSQL6,
 			Run:   query6,
 		},
+		{
+			Use:   "q7",
+			Short: queryIndexSQL7,
+			Run:   query7,
+		},
+		{
+			Use:   "q8",
+			Short: queryIndexSQL8,
+			Run:   query8,
+		},
 	}
 )
 
@@ -71,6 +81,8 @@ const (
 	queryIndexSQL4  = "SELECT * FROM INFORMATION_SCHEMA.TIDB_INDEX_USAGE WHERE table_schema = '%s' AND table_name = '%s' AND index_name = '%s';"
 	queryIndexSQL5  = "SELECT * FROM information_schema.key_column_usage WHERE table_schema = '%s' AND table_name = '%s';"
 	queryIndexSQL6  = "SELECT * FROM information_schema.key_column_usage WHERE table_schema = '%s' AND table_name = '%s' AND lower(constraint_name) = 'primary';"
+	queryIndexSQL7  = "SELECT * FROM information_schema.table_constraints WHERE table_schema = '%s' AND table_name = '%s' AND constraint_type = 'PRIMARY KEY';"
+	queryIndexSQL8  = "SELECT * FROM information_schema.table_constraints WHERE table_schema = '%s' AND table_name = '%s' AND constraint_type = 'UNIQUE';"
 )
 
 func init_flags() {
@@ -82,6 +94,7 @@ func init_flags() {
 	IndexCmd.PersistentFlags().StringVar(&util.ColumnNamePrefix, "column_prefix", "c", "The prefix of the column name")
 	IndexCmd.PersistentFlags().IntVar(&util.IndexCnt, "index_cnt", 3, "The number of indexes to create")
 	IndexCmd.PersistentFlags().StringVar(&util.IndexNamePrefix, "index_prefix", "i", "The prefix of the index name")
+	IndexCmd.PersistentFlags().IntVar(&util.UniqueCnt, "unique_cnt", 2, "The number of unique indexes to create")
 }
 
 func init() {
@@ -93,6 +106,10 @@ func init() {
 	if util.IndexCnt > util.ColumnCnt {
 		fmt.Fprintf(os.Stderr, "index count is truncated to the same as column count %d", util.ColumnCnt)
 		util.IndexCnt = util.ColumnCnt
+	}
+	if util.UniqueCnt > util.IndexCnt {
+		fmt.Fprintf(os.Stderr, "unique index count is truncated to the same as index count %d", util.IndexCnt)
+		util.UniqueCnt = util.IndexCnt
 	}
 }
 
@@ -110,6 +127,9 @@ func prepare(_ *cobra.Command, _ []string) {
 	if util.IndexCnt > 0 {
 		sb.WriteString(", ")
 		for i := 0; i < util.IndexCnt; i++ {
+			if i < util.UniqueCnt {
+				sb.WriteString("unique ")
+			}
 			sb.WriteString(fmt.Sprintf("key %s_%d(%s_%d)", util.IndexNamePrefix, i, util.ColumnNamePrefix, i))
 			if i != util.IndexCnt-1 {
 				sb.WriteString(", ")
@@ -175,4 +195,20 @@ func query6(_ *cobra.Command, _ []string) {
 			fmt.Sprintf("%s_%d", util.TableNamePrefix, rand.Intn(util.TableCnt)))
 	})
 	fmt.Printf("Finish query '%s'", queryIndexSQL6)
+}
+
+func query7(_ *cobra.Command, _ []string) {
+	util.QuerySQL(func() string {
+		return fmt.Sprintf(queryIndexSQL7, fmt.Sprintf("%s_%d", util.DatabaseNamePrefix, rand.Intn(util.DatabaseCnt)),
+			fmt.Sprintf("%s_%d", util.TableNamePrefix, rand.Intn(util.TableCnt)))
+	})
+	fmt.Printf("Finish query '%s'", queryIndexSQL7)
+}
+
+func query8(_ *cobra.Command, _ []string) {
+	util.QuerySQL(func() string {
+		return fmt.Sprintf(queryIndexSQL8, fmt.Sprintf("%s_%d", util.DatabaseNamePrefix, rand.Intn(util.DatabaseCnt)),
+			fmt.Sprintf("%s_%d", util.TableNamePrefix, rand.Intn(util.TableCnt)))
+	})
+	fmt.Printf("Finish query '%s'", queryIndexSQL8)
 }

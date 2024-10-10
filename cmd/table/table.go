@@ -29,12 +29,12 @@ var (
 
 	queryCmds = []*cobra.Command{
 		{
-			Use:   "table_q1",
+			Use:   "q1",
 			Short: queryTableSQL1,
 			Run:   query1,
 		},
 		{
-			Use:   "table_q2",
+			Use:   "q2",
 			Short: queryTableSQL2,
 			Run:   query2,
 		},

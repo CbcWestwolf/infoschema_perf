@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"infoschema_perf/cmd/db"
+	"infoschema_perf/cmd/statistics"
 	"infoschema_perf/cmd/table"
 	"infoschema_perf/cmd/util"
 
@@ -24,7 +25,8 @@ func init_flags() {
 	rootCmd.PersistentFlags().IntVar(&util.Port, "port", 4000, "The port of the database")
 	rootCmd.PersistentFlags().StringVar(&util.User, "user", "root", "The user of the database")
 	rootCmd.PersistentFlags().IntVar(&util.Thread, "thread", 4, "The number of threads to use")
-	rootCmd.PersistentFlags().StringVar(&util.TimeStr, "time", "", "The duration of the test. \"\" means forever")
+	rootCmd.PersistentFlags().StringVar(&util.TimeStr, "time", "60s", "The duration of the test. Set to \"\" means forever")
+	rootCmd.PersistentFlags().BoolVar(&util.Stdout, "stdout", false, "Whether to print the result to stdout")
 }
 
 func print_flags() {
@@ -36,4 +38,5 @@ func init() {
 
 	rootCmd.AddCommand(db.DbCmd)
 	rootCmd.AddCommand(table.TableCmd)
+	rootCmd.AddCommand(statistics.StatisticsCmd)
 }

@@ -14,6 +14,10 @@ var (
 	TableCnt        int
 	TableNamePrefix string
 
+	ColumnCnt        int
+	ColumnNamePrefix string
+
+	Stdout  bool
 	TimeStr string
 )
 

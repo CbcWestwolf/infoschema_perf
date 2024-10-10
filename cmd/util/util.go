@@ -56,6 +56,9 @@ func GetMultiConnsForExec() (chs []chan string, waitAndClose func()) {
 		go func(i int) {
 			defer wg.Done()
 			for sql := range chs[i] {
+				if Stdout {
+					fmt.Println("Exec:", sql)
+				}
 				_, err := conns[i].ExecContext(context.Background(), sql)
 				if err != nil {
 					fmt.Fprintln(os.Stderr, err, sql)
@@ -104,6 +107,10 @@ func getMultiConnsForQuery(wg *sync.WaitGroup, ctx *context.Context, c *atomic.U
 				case sql, ok := <-chs[i]:
 					if !ok {
 						return
+					}
+
+					if Stdout {
+						fmt.Println("Query:", sql)
 					}
 
 					if rows, err := conns[i].QueryContext(context.Background(), sql); err != nil {

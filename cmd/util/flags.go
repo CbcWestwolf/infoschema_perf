@@ -1,7 +1,5 @@
 package util
 
-import "time"
-
 var (
 	Host   string
 	Port   int
@@ -23,8 +21,4 @@ var (
 
 	Stdout  bool
 	TimeStr string
-)
-
-const (
-	Tick = 10 * time.Millisecond
 )

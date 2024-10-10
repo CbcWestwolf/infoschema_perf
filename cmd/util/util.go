@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"math/rand"
 	"os"
 	"sync"
 	"time"
@@ -82,7 +81,7 @@ func GetMultiConnsForExec() (chs []chan string, waitAndClose func()) {
 	return
 }
 
-func getMultiConnsForQuery(wg *sync.WaitGroup, ctx *context.Context, c *atomic.Uint64) (chs []chan string, waitAndClose func()) {
+func getMultiConnsForQuery(wg *sync.WaitGroup, ctx *context.Context, c *atomic.Uint64, input chan string) (waitAndClose func()) {
 	db, conns, err := openMultiConns(Thread, Host, Port, User, "")
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
@@ -93,10 +92,7 @@ func getMultiConnsForQuery(wg *sync.WaitGroup, ctx *context.Context, c *atomic.U
 		panic("ctx should not be nil")
 	}
 
-	chs = make([]chan string, Thread)
-
 	for i := 0; i < Thread; i++ {
-		chs[i] = make(chan string)
 		wg.Add(1)
 		go func(i int) {
 			defer wg.Done()
@@ -104,7 +100,7 @@ func getMultiConnsForQuery(wg *sync.WaitGroup, ctx *context.Context, c *atomic.U
 				select {
 				case <-(*ctx).Done():
 					return
-				case sql, ok := <-chs[i]:
+				case sql, ok := <-input:
 					if !ok {
 						return
 					}
@@ -140,44 +136,34 @@ func QuerySQL(getSQL func() string) {
 		counter = *atomic.NewUint64(0)
 		ctx     = context.Background()
 	)
+	timeout := 60 * time.Second
 	if TimeStr != "" {
 		t, err := time.ParseDuration(TimeStr)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "Fail to parse '%s' as time limitation. Execute with no time limitation\n", TimeStr)
-		} else {
-			var cancel context.CancelFunc
-			fmt.Printf("Execute for %s\n", t.String())
-			ctx, cancel = context.WithTimeout(ctx, t)
-			defer cancel()
+		if err == nil {
+			timeout = t
 		}
-	} else {
-		fmt.Println("Execute with no time limitation")
 	}
+	var cancel context.CancelFunc
+	fmt.Printf("Execute for %s\n", timeout.String())
+	ctx, cancel = context.WithTimeout(ctx, timeout)
+	defer cancel()
 
-	chs, clean := getMultiConnsForQuery(&wg, &ctx, &counter)
+	input := make(chan string)
+	clean := getMultiConnsForQuery(&wg, &ctx, &counter, input)
 	defer clean()
 
 	startTime := time.Now()
-	tick := time.NewTicker(Tick)
-	defer tick.Stop()
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		for {
-			select {
-			case <-ctx.Done():
-				return
-			case <-tick.C:
-				chs[rand.Intn(Thread)] <- getSQL()
-			}
+Loop:
+	for {
+		select {
+		case <-ctx.Done():
+			break Loop
+		default:
+			input <- getSQL()
 		}
-	}()
-
-	<-ctx.Done()
-	for i := 0; i < Thread; i++ {
-		close(chs[i])
 	}
-
 	wg.Wait()
+	close(input)
+
 	fmt.Printf("Count %d, duration %s\n", counter.Load(), time.Since(startTime).String())
 }

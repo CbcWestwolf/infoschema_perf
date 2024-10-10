@@ -17,7 +17,7 @@ var (
 
 	prepareCmd = &cobra.Command{
 		Use:   "prepare",
-		Short: fmt.Sprintf("Prepare tables for test (%s)", prepareStatisticsSQL),
+		Short: fmt.Sprintf("Prepare tables for test (%s)", prepareTableSQL),
 		Run:   prepare,
 	}
 
@@ -42,11 +42,11 @@ var (
 )
 
 const (
-	prepareDbSQL         = "CREATE DATABASE IF NOT EXISTS %s_%d"
-	prepareStatisticsSQL = "CREATE TABLE IF NOT EXISTS %s.%s (id int primary key, %s);"
-	cleanSQL             = "DROP DATABASE IF EXISTS %s_%d"
-	queryStatisticsSQL1  = "SELECT * FROM INFORMATION_SCHEMA.STATISTICS WHERE table_schema = '%s' AND table_name = '%s' AND column_name = '%s';"
-	queryStatisticsSQL2  = "SELECT * FROM INFORMATION_SCHEMA.STATISTICS WHERE table_schema = '%s' AND table_name = '%s' AND index_name = 'PRIMARY' ;"
+	prepareDbSQL        = "CREATE DATABASE IF NOT EXISTS %s_%d"
+	prepareTableSQL     = "CREATE TABLE IF NOT EXISTS %s.%s (id int primary key, %s);"
+	cleanSQL            = "DROP DATABASE IF EXISTS %s_%d"
+	queryStatisticsSQL1 = "SELECT * FROM INFORMATION_SCHEMA.STATISTICS WHERE table_schema = '%s' AND table_name = '%s' AND column_name = '%s';"
+	queryStatisticsSQL2 = "SELECT * FROM INFORMATION_SCHEMA.STATISTICS WHERE table_schema = '%s' AND table_name = '%s' AND index_name = 'PRIMARY' ;"
 )
 
 func init_flags() {
@@ -80,7 +80,7 @@ func prepare(_ *cobra.Command, _ []string) {
 	for i := 0; i < util.DatabaseCnt; i++ {
 		chs[i%util.Thread] <- fmt.Sprintf(prepareDbSQL, util.DatabaseNamePrefix, i)
 		for j := 0; j < util.TableCnt; j++ {
-			chs[i%util.Thread] <- fmt.Sprintf(prepareStatisticsSQL, fmt.Sprintf("%s_%d", util.DatabaseNamePrefix, i),
+			chs[i%util.Thread] <- fmt.Sprintf(prepareTableSQL, fmt.Sprintf("%s_%d", util.DatabaseNamePrefix, i),
 				fmt.Sprintf("%s_%d", util.TableNamePrefix, j), sb.String())
 		}
 	}

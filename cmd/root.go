@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"infoschema_perf/cmd/db"
+	"infoschema_perf/cmd/index"
 	"infoschema_perf/cmd/statistics"
 	"infoschema_perf/cmd/table"
 	"infoschema_perf/cmd/util"
@@ -39,4 +40,5 @@ func init() {
 	rootCmd.AddCommand(db.DbCmd)
 	rootCmd.AddCommand(table.TableCmd)
 	rootCmd.AddCommand(statistics.StatisticsCmd)
+	rootCmd.AddCommand(index.IndexCmd)
 }

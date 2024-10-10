@@ -143,7 +143,7 @@ func QuerySQL(getSQL func() string) {
 	if TimeStr != "" {
 		t, err := time.ParseDuration(TimeStr)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Fail to parse '%s' as time limitation. Execute with no time limitation", TimeStr)
+			fmt.Fprintf(os.Stderr, "Fail to parse '%s' as time limitation. Execute with no time limitation\n", TimeStr)
 		} else {
 			var cancel context.CancelFunc
 			fmt.Printf("Execute for %s\n", t.String())

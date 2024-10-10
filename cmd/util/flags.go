@@ -17,6 +17,9 @@ var (
 	ColumnCnt        int
 	ColumnNamePrefix string
 
+	IndexCnt        int
+	IndexNamePrefix string
+
 	Stdout  bool
 	TimeStr string
 )

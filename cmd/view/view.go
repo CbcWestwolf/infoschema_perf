@@ -22,8 +22,8 @@ var (
 
 	cleanCmd = &cobra.Command{
 		Use:   "clean",
-		Short: fmt.Sprintf("Clean views after test (%s)", cleanSQL),
-		Run:   clean,
+		Short: fmt.Sprintf("Clean views after test (%s)", util.CleanSQL),
+		Run:   util.Clean,
 	}
 
 	queryCmds = []*cobra.Command{
@@ -44,7 +44,6 @@ const (
 	prepareDbSQL    = "CREATE DATABASE IF NOT EXISTS %s_%d"
 	prepareTableSQL = "CREATE TABLE IF NOT EXISTS %s.%s (id int primary key, name varchar(255));"
 	prepareViewSQL  = "CREATE OR REPLACE VIEW %s.%s AS SELECT * FROM %s.%s"
-	cleanSQL        = "DROP DATABASE IF EXISTS %s_%d"
 	queryViewSQL1   = "SELECT * FROM information_schema.views WHERE table_schema = '%s';"
 	queryViewSQL2   = "SELECT * FROM information_schema.views WHERE table_schema = '%s' AND table_name = '%s';"
 )
@@ -79,17 +78,6 @@ func prepare(_ *cobra.Command, _ []string) {
 	}
 
 	fmt.Println("Finish prepare tables")
-}
-
-func clean(_ *cobra.Command, _ []string) {
-	chs, clean := util.GetMultiConnsForExec()
-	defer clean()
-
-	for i := 0; i < util.DatabaseCnt; i++ {
-		chs[i%util.Thread] <- fmt.Sprintf(cleanSQL, util.DatabaseNamePrefix, i)
-	}
-
-	fmt.Println("Finish clean tables")
 }
 
 func query1(_ *cobra.Command, _ []string) {

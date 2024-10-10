@@ -24,8 +24,8 @@ var (
 
 	cleanCmd = &cobra.Command{
 		Use:   "clean",
-		Short: fmt.Sprintf("Clean tables after test (%s)", cleanSQL),
-		Run:   clean,
+		Short: fmt.Sprintf("Clean tables after test (%s)", util.CleanSQL),
+		Run:   util.Clean,
 	}
 
 	queryCmds = []*cobra.Command{
@@ -49,17 +49,28 @@ var (
 			Short: queryIndexSQL4,
 			Run:   query4,
 		},
+		{
+			Use:   "q5",
+			Short: queryIndexSQL5,
+			Run:   query5,
+		},
+		{
+			Use:   "q6",
+			Short: queryIndexSQL6,
+			Run:   query6,
+		},
 	}
 )
 
 const (
 	prepareDbSQL    = "CREATE DATABASE IF NOT EXISTS %s_%d"
 	prepareTableSQL = "CREATE TABLE IF NOT EXISTS %s.%s (id int primary key, %s);"
-	cleanSQL        = "DROP DATABASE IF EXISTS %s_%d"
 	queryIndexSQL1  = "SELECT * FROM INFORMATION_SCHEMA.TIDB_INDEXES WHERE table_schema = '%s' AND table_name = '%s';"
 	queryIndexSQL2  = "SELECT * FROM INFORMATION_SCHEMA.TIDB_INDEXES WHERE table_schema = '%s' AND table_name = '%s' AND lower(key_name) = 'primary';"
 	queryIndexSQL3  = "SELECT * FROM INFORMATION_SCHEMA.TIDB_INDEX_USAGE WHERE table_schema = '%s' AND table_name = '%s';"
 	queryIndexSQL4  = "SELECT * FROM INFORMATION_SCHEMA.TIDB_INDEX_USAGE WHERE table_schema = '%s' AND table_name = '%s' AND index_name = '%s';"
+	queryIndexSQL5  = "SELECT * FROM information_schema.key_column_usage WHERE table_schema = '%s' AND table_name = '%s';"
+	queryIndexSQL6  = "SELECT * FROM information_schema.key_column_usage WHERE table_schema = '%s' AND table_name = '%s' AND lower(constraint_name) = 'primary';"
 )
 
 func init_flags() {
@@ -117,17 +128,6 @@ func prepare(_ *cobra.Command, _ []string) {
 	fmt.Println("Finish prepare tables for indexes")
 }
 
-func clean(_ *cobra.Command, _ []string) {
-	chs, clean := util.GetMultiConnsForExec()
-	defer clean()
-
-	for i := 0; i < util.DatabaseCnt; i++ {
-		chs[i%util.Thread] <- fmt.Sprintf(cleanSQL, util.DatabaseNamePrefix, i)
-	}
-
-	fmt.Println("Finish clean tables")
-}
-
 func query1(_ *cobra.Command, _ []string) {
 	util.QuerySQL(func() string {
 		return fmt.Sprintf(queryIndexSQL1, fmt.Sprintf("%s_%d", util.DatabaseNamePrefix, rand.Intn(util.DatabaseCnt)),
@@ -159,4 +159,20 @@ func query4(_ *cobra.Command, _ []string) {
 			fmt.Sprintf("%s_%d", util.IndexNamePrefix, rand.Intn(util.IndexCnt)))
 	})
 	fmt.Printf("Finish query '%s'", queryIndexSQL4)
+}
+
+func query5(_ *cobra.Command, _ []string) {
+	util.QuerySQL(func() string {
+		return fmt.Sprintf(queryIndexSQL5, fmt.Sprintf("%s_%d", util.DatabaseNamePrefix, rand.Intn(util.DatabaseCnt)),
+			fmt.Sprintf("%s_%d", util.TableNamePrefix, rand.Intn(util.TableCnt)))
+	})
+	fmt.Printf("Finish query '%s'", queryIndexSQL5)
+}
+
+func query6(_ *cobra.Command, _ []string) {
+	util.QuerySQL(func() string {
+		return fmt.Sprintf(queryIndexSQL6, fmt.Sprintf("%s_%d", util.DatabaseNamePrefix, rand.Intn(util.DatabaseCnt)),
+			fmt.Sprintf("%s_%d", util.TableNamePrefix, rand.Intn(util.TableCnt)))
+	})
+	fmt.Printf("Finish query '%s'", queryIndexSQL6)
 }

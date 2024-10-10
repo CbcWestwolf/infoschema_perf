@@ -22,8 +22,8 @@ var (
 
 	cleanCmd = &cobra.Command{
 		Use:   "clean",
-		Short: fmt.Sprintf("Clean databases after test (%s)", cleanDbSQL),
-		Run:   clean,
+		Short: fmt.Sprintf("Clean databases after test (%s)", util.CleanSQL),
+		Run:   util.Clean,
 	}
 
 	queryCmds = []*cobra.Command{
@@ -42,7 +42,6 @@ var (
 
 const (
 	prepareDbSQL = "CREATE DATABASE IF NOT EXISTS %s_%d"
-	cleanDbSQL   = "DROP DATABASE IF EXISTS %s_%d"
 	queryDbSQL1  = "SELECT * FROM information_schema.schemata WHERE schema_name = '%s_%d'"
 	queryDbSQL2  = "SELECT * FROM information_schema.schemata WHERE schema_name LIKE '%s%%';"
 )
@@ -68,17 +67,6 @@ func prepare(_ *cobra.Command, _ []string) {
 		chs[i%util.Thread] <- sql
 	}
 	fmt.Println("Finish prepare databases")
-}
-
-func clean(_ *cobra.Command, _ []string) {
-	chs, clean := util.GetMultiConnsForExec()
-	defer clean()
-
-	for i := 0; i < util.DatabaseCnt; i++ {
-		sql := fmt.Sprintf(cleanDbSQL, util.DatabaseNamePrefix, i)
-		chs[i%util.Thread] <- sql
-	}
-	fmt.Println("Finish clean databases")
 }
 
 func query1(_ *cobra.Command, _ []string) {

@@ -9,7 +9,12 @@ import (
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/spf13/cobra"
 	"go.uber.org/atomic"
+)
+
+const (
+	CleanSQL = "DROP DATABASE IF EXISTS %s_%d"
 )
 
 func openDB(user, host string, port int, db_name string) (*sql.DB, error) {
@@ -37,6 +42,17 @@ func openMultiConns(connNum int, host string, port int, user string, db_name str
 	}
 
 	return
+}
+
+func Clean(_ *cobra.Command, _ []string) {
+	chs, clean := GetMultiConnsForExec()
+	defer clean()
+
+	for i := 0; i < DatabaseCnt; i++ {
+		chs[i%Thread] <- fmt.Sprintf(CleanSQL, DatabaseNamePrefix, i)
+	}
+
+	fmt.Println("Finish clean tables")
 }
 
 // Remember to close the returning db, conns and chs

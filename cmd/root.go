@@ -4,6 +4,7 @@ import (
 	"infoschema_perf/cmd/db"
 	"infoschema_perf/cmd/fk"
 	"infoschema_perf/cmd/index"
+	"infoschema_perf/cmd/partition"
 	"infoschema_perf/cmd/statistics"
 	"infoschema_perf/cmd/table"
 	"infoschema_perf/cmd/util"
@@ -28,6 +29,9 @@ func init_flags() {
 	rootCmd.PersistentFlags().IntVar(&util.Thread, "thread", 4, "The number of threads to use")
 	rootCmd.PersistentFlags().StringVar(&util.TimeStr, "time", "60s", "The duration of the test.")
 	rootCmd.PersistentFlags().BoolVar(&util.Stdout, "stdout", false, "Whether to print the result to stdout")
+
+	rootCmd.PersistentFlags().IntVar(&util.DatabaseCnt, "db_cnt", 3, "The number of databases to create")
+	rootCmd.PersistentFlags().StringVar(&util.DatabaseNamePrefix, "db_prefix", "info_test", "The prefix of the database name")
 }
 
 func init() {
@@ -39,4 +43,5 @@ func init() {
 	rootCmd.AddCommand(index.IndexCmd)
 	rootCmd.AddCommand(view.ViewCmd)
 	rootCmd.AddCommand(fk.FkCmd)
+	rootCmd.AddCommand(partition.PartitionCmd)
 }

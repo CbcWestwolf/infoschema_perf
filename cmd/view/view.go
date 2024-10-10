@@ -49,8 +49,6 @@ const (
 )
 
 func init_flags() {
-	ViewCmd.PersistentFlags().IntVar(&util.DatabaseCnt, "db_cnt", 1, "The number of databases to create")
-	ViewCmd.PersistentFlags().StringVar(&util.DatabaseNamePrefix, "db_prefix", "info_test", "The prefix of the database name")
 	ViewCmd.PersistentFlags().IntVar(&util.TableCnt, "table_cnt", 10, "The number of views to create")
 	ViewCmd.PersistentFlags().StringVar(&util.TableNamePrefix, "table_prefix", "t", "The prefix of the table name")
 	ViewCmd.PersistentFlags().StringVar(&util.ViewNamePrefix, "view_prefix", "v", "The prefix of the view name")

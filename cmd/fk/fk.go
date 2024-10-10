@@ -49,8 +49,6 @@ const (
 )
 
 func init_flags() {
-	FkCmd.PersistentFlags().IntVar(&util.DatabaseCnt, "db_cnt", 1, "The number of databases to create")
-	FkCmd.PersistentFlags().StringVar(&util.DatabaseNamePrefix, "db_prefix", "info_test", "The prefix of the database name")
 	FkCmd.PersistentFlags().IntVar(&util.TableCnt, "table_cnt", 10, "The number of views to create")
 	FkCmd.PersistentFlags().StringVar(&util.TableNamePrefix, "table_prefix", "t", "The prefix of the table name")
 }

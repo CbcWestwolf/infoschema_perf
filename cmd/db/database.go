@@ -46,14 +46,7 @@ const (
 	queryDbSQL2  = "SELECT * FROM information_schema.schemata WHERE schema_name LIKE '%s%%';"
 )
 
-func init_flags() {
-	DbCmd.PersistentFlags().IntVar(&util.DatabaseCnt, "db_cnt", 1, "The number of databases to create")
-	DbCmd.PersistentFlags().StringVar(&util.DatabaseNamePrefix, "db_prefix", "info_test", "The prefix of the database name")
-}
-
 func init() {
-	init_flags()
-
 	DbCmd.AddCommand(prepareCmd, cleanCmd)
 	DbCmd.AddCommand(queryCmds...)
 }

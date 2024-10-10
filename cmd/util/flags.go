@@ -13,6 +13,7 @@ var (
 
 	TableCnt        int
 	TableNamePrefix string
+	ViewNamePrefix  string
 
 	ColumnCnt        int
 	ColumnNamePrefix string

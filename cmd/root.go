@@ -7,6 +7,7 @@ import (
 	"infoschema_perf/cmd/statistics"
 	"infoschema_perf/cmd/table"
 	"infoschema_perf/cmd/util"
+	"infoschema_perf/cmd/view"
 
 	"github.com/spf13/cobra"
 )
@@ -41,4 +42,5 @@ func init() {
 	rootCmd.AddCommand(table.TableCmd)
 	rootCmd.AddCommand(statistics.StatisticsCmd)
 	rootCmd.AddCommand(index.IndexCmd)
+	rootCmd.AddCommand(view.ViewCmd)
 }

@@ -2,10 +2,12 @@ package cmd
 
 import (
 	"infoschema_perf/cmd/check"
+	"infoschema_perf/cmd/column"
 	"infoschema_perf/cmd/db"
 	"infoschema_perf/cmd/fk"
 	"infoschema_perf/cmd/index"
 	"infoschema_perf/cmd/partition"
+	"infoschema_perf/cmd/sequence"
 	"infoschema_perf/cmd/statistics"
 	"infoschema_perf/cmd/table"
 	"infoschema_perf/cmd/util"
@@ -46,4 +48,6 @@ func init() {
 	rootCmd.AddCommand(fk.FkCmd)
 	rootCmd.AddCommand(partition.PartitionCmd)
 	rootCmd.AddCommand(check.CheckConstraintCmd)
+	rootCmd.AddCommand(sequence.SequenceCmd)
+	rootCmd.AddCommand(column.ColumnCmd)
 }

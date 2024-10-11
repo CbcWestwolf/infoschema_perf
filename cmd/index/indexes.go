@@ -13,19 +13,13 @@ import (
 var (
 	IndexCmd = &cobra.Command{
 		Use:   "index",
-		Short: "Prepare, test and clean table for test indexes",
+		Short: "Prepare and test indexes",
 	}
 
 	prepareCmd = &cobra.Command{
 		Use:   "prepare",
 		Short: fmt.Sprintf("Prepare tables for test (%s)", prepareTableSQL),
 		Run:   prepare,
-	}
-
-	cleanCmd = &cobra.Command{
-		Use:   "clean",
-		Short: fmt.Sprintf("Clean tables after test (%s)", util.CleanSQL),
-		Run:   util.Clean,
 	}
 
 	queryCmds = []*cobra.Command{
@@ -98,7 +92,7 @@ func init_flags() {
 func init() {
 	init_flags()
 
-	IndexCmd.AddCommand(prepareCmd, cleanCmd)
+	IndexCmd.AddCommand(prepareCmd)
 	IndexCmd.AddCommand(queryCmds...)
 
 	if util.IndexCnt > util.ColumnCnt {

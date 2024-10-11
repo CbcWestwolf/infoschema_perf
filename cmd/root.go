@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"infoschema_perf/cmd/check"
 	"infoschema_perf/cmd/column"
 	"infoschema_perf/cmd/db"
@@ -20,6 +21,10 @@ var (
 	rootCmd = &cobra.Command{Use: "infoschema_perf", Short: "infoschema_perf is a tool to test the performance of information_schema queries"}
 )
 
+const (
+	cleanSQL = "DROP DATABASE IF EXISTS %s_%d"
+)
+
 // Execute executes the root command.
 func Execute() error {
 	return rootCmd.Execute()
@@ -37,8 +42,25 @@ func init_flags() {
 	rootCmd.PersistentFlags().StringVar(&util.DatabaseNamePrefix, "db_prefix", "info_test", "The prefix of the database name")
 }
 
+var cleanCmd = &cobra.Command{
+	Use:   "clean",
+	Short: fmt.Sprintf("Clean databases after test (%s)", cleanSQL),
+	Run: func(_ *cobra.Command, _ []string) {
+		chs, clean := util.GetMultiConnsForExec()
+		defer clean()
+
+		for i := 0; i < util.DatabaseCnt; i++ {
+			chs[i%util.Thread] <- fmt.Sprintf(cleanSQL, util.DatabaseNamePrefix, i)
+		}
+
+		fmt.Println("Finish clean tables")
+	},
+}
+
 func init() {
 	init_flags()
+
+	rootCmd.AddCommand(cleanCmd)
 
 	rootCmd.AddCommand(db.DbCmd)
 	rootCmd.AddCommand(table.TableCmd)

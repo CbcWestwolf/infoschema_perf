@@ -11,19 +11,13 @@ import (
 var (
 	DbCmd = &cobra.Command{
 		Use:   "db",
-		Short: "Prepare, test and clean database for test",
+		Short: "Prepare and test database",
 	}
 
 	prepareCmd = &cobra.Command{
 		Use:   "prepare",
 		Short: fmt.Sprintf("Prepare databases for test (%s)", prepareDbSQL),
 		Run:   prepare,
-	}
-
-	cleanCmd = &cobra.Command{
-		Use:   "clean",
-		Short: fmt.Sprintf("Clean databases after test (%s)", util.CleanSQL),
-		Run:   util.Clean,
 	}
 
 	queryCmds = []*cobra.Command{
@@ -47,7 +41,7 @@ const (
 )
 
 func init() {
-	DbCmd.AddCommand(prepareCmd, cleanCmd)
+	DbCmd.AddCommand(prepareCmd)
 	DbCmd.AddCommand(queryCmds...)
 }
 

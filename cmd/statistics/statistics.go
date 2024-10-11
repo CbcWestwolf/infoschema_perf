@@ -12,19 +12,13 @@ import (
 var (
 	StatisticsCmd = &cobra.Command{
 		Use:   "statistics",
-		Short: "Prepare, test and clean table for test",
+		Short: "Prepare and test table",
 	}
 
 	prepareCmd = &cobra.Command{
 		Use:   "prepare",
 		Short: fmt.Sprintf("Prepare tables for test (%s)", prepareTableSQL),
 		Run:   prepare,
-	}
-
-	cleanCmd = &cobra.Command{
-		Use:   "clean",
-		Short: fmt.Sprintf("Clean tables after test (%s)", util.CleanSQL),
-		Run:   util.Clean,
 	}
 
 	queryCmds = []*cobra.Command{
@@ -58,7 +52,7 @@ func init_flags() {
 func init() {
 	init_flags()
 
-	StatisticsCmd.AddCommand(prepareCmd, cleanCmd)
+	StatisticsCmd.AddCommand(prepareCmd)
 	StatisticsCmd.AddCommand(queryCmds...)
 }
 

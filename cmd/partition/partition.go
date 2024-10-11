@@ -11,19 +11,13 @@ import (
 var (
 	PartitionCmd = &cobra.Command{
 		Use:   "partition",
-		Short: "Prepare, test and clean partition for test",
+		Short: "Prepare and test partition",
 	}
 
 	prepareCmd = &cobra.Command{
 		Use:   "prepare",
 		Short: fmt.Sprintf("Prepare partitions for test (%s)", preparePartitionSQL),
 		Run:   prepare,
-	}
-
-	cleanCmd = &cobra.Command{
-		Use:   "clean",
-		Short: fmt.Sprintf("Clean tables after test (%s)", util.CleanSQL),
-		Run:   util.Clean,
 	}
 
 	queryCmds = []*cobra.Command{
@@ -62,7 +56,7 @@ func init_flags() {
 func init() {
 	init_flags()
 
-	PartitionCmd.AddCommand(prepareCmd, cleanCmd)
+	PartitionCmd.AddCommand(prepareCmd)
 	PartitionCmd.AddCommand(queryCmds...)
 }
 

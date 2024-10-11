@@ -11,19 +11,13 @@ import (
 var (
 	FkCmd = &cobra.Command{
 		Use:   "fk",
-		Short: "Prepare, test and clean fk for test",
+		Short: "Prepare and test fk",
 	}
 
 	prepareCmd = &cobra.Command{
 		Use:   "prepare",
 		Short: fmt.Sprintf("Prepare fk for test (%s)", prepareFkTableSQL),
 		Run:   prepare,
-	}
-
-	cleanCmd = &cobra.Command{
-		Use:   "clean",
-		Short: fmt.Sprintf("Clean fk after test (%s)", util.CleanSQL),
-		Run:   util.Clean,
 	}
 
 	queryCmds = []*cobra.Command{
@@ -62,7 +56,7 @@ func init_flags() {
 func init() {
 	init_flags()
 
-	FkCmd.AddCommand(prepareCmd, cleanCmd)
+	FkCmd.AddCommand(prepareCmd)
 	FkCmd.AddCommand(queryCmds...)
 }
 

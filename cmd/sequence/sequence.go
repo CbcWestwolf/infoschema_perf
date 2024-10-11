@@ -11,19 +11,13 @@ import (
 var (
 	SequenceCmd = &cobra.Command{
 		Use:   "sequence",
-		Short: "Prepare, test and clean sequence for test",
+		Short: "Prepare and test sequence",
 	}
 
 	prepareCmd = &cobra.Command{
 		Use:   "prepare",
 		Short: fmt.Sprintf("Prepare sequences for test (%s)", prepareSequenceSQL),
 		Run:   prepare,
-	}
-
-	cleanCmd = &cobra.Command{
-		Use:   "clean",
-		Short: fmt.Sprintf("Clean sequences after test (%s)", util.CleanSQL),
-		Run:   util.Clean,
 	}
 
 	queryCmds = []*cobra.Command{
@@ -49,7 +43,7 @@ func init_flags() {
 func init() {
 	init_flags()
 
-	SequenceCmd.AddCommand(prepareCmd, cleanCmd)
+	SequenceCmd.AddCommand(prepareCmd)
 	SequenceCmd.AddCommand(queryCmds...)
 }
 

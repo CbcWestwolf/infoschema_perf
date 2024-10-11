@@ -11,19 +11,13 @@ import (
 var (
 	ViewCmd = &cobra.Command{
 		Use:   "view",
-		Short: "Prepare, test and clean view for test",
+		Short: "Prepare and test view",
 	}
 
 	prepareCmd = &cobra.Command{
 		Use:   "prepare",
 		Short: fmt.Sprintf("Prepare views for test (%s)", prepareViewSQL),
 		Run:   prepare,
-	}
-
-	cleanCmd = &cobra.Command{
-		Use:   "clean",
-		Short: fmt.Sprintf("Clean views after test (%s)", util.CleanSQL),
-		Run:   util.Clean,
 	}
 
 	queryCmds = []*cobra.Command{
@@ -57,7 +51,7 @@ func init_flags() {
 func init() {
 	init_flags()
 
-	ViewCmd.AddCommand(prepareCmd, cleanCmd)
+	ViewCmd.AddCommand(prepareCmd)
 	ViewCmd.AddCommand(queryCmds...)
 }
 

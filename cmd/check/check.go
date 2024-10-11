@@ -12,19 +12,13 @@ import (
 var (
 	CheckConstraintCmd = &cobra.Command{
 		Use:   "check",
-		Short: "Prepare, test and clean check constraints for test",
+		Short: "Prepare and test check constraints",
 	}
 
 	prepareCmd = &cobra.Command{
 		Use:   "prepare",
 		Short: fmt.Sprintf("Prepare tables for test (%s)", prepareCheckConstraintSQL),
 		Run:   prepare,
-	}
-
-	cleanCmd = &cobra.Command{
-		Use:   "clean",
-		Short: fmt.Sprintf("Clean tables after test (%s)", util.CleanSQL),
-		Run:   util.Clean,
 	}
 
 	queryCmds = []*cobra.Command{
@@ -64,7 +58,7 @@ func init_flags() {
 func init() {
 	init_flags()
 
-	CheckConstraintCmd.AddCommand(prepareCmd, cleanCmd)
+	CheckConstraintCmd.AddCommand(prepareCmd)
 	CheckConstraintCmd.AddCommand(queryCmds...)
 }
 

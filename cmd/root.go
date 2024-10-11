@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"infoschema_perf/cmd/check"
 	"infoschema_perf/cmd/db"
 	"infoschema_perf/cmd/fk"
 	"infoschema_perf/cmd/index"
@@ -44,4 +45,5 @@ func init() {
 	rootCmd.AddCommand(view.ViewCmd)
 	rootCmd.AddCommand(fk.FkCmd)
 	rootCmd.AddCommand(partition.PartitionCmd)
+	rootCmd.AddCommand(check.CheckConstraintCmd)
 }

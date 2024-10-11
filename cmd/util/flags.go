@@ -15,6 +15,7 @@ var (
 
 	ColumnCnt        int
 	ColumnNamePrefix string
+	ConstraintCnt    int
 
 	IndexCnt        int
 	IndexNamePrefix string

@@ -108,12 +108,28 @@ func getMultiConnsForQuery(wg *sync.WaitGroup, ctx *context.Context, c *atomic.U
 						fmt.Println("Query:", sql)
 					}
 
-					if rows, err := conns[i].QueryContext(context.Background(), sql); err != nil {
+					rows, err := conns[i].QueryContext(context.Background(), sql)
+					if err != nil {
 						fmt.Fprintln(os.Stderr, err, sql)
-					} else if err := rows.Close(); err != nil {
+						continue
+					}
+					cols, err := rows.Columns()
+					if err != nil {
 						fmt.Fprintln(os.Stderr, err, sql)
-					} else if c != nil {
-						c.Inc()
+						continue
+					}
+					dest := make([]*interface{}, len(cols))
+					c.Inc()
+					resNum := 0
+					for rows.Next() {
+						rows.Scan(dest)
+						resNum++
+					}
+					if Stdout {
+						fmt.Printf("#rows: %d\n", resNum)
+					}
+					if err := rows.Close(); err != nil {
+						fmt.Fprintln(os.Stderr, err, sql)
 					}
 				}
 			}

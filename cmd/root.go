@@ -34,7 +34,7 @@ func init_flags() {
 	rootCmd.PersistentFlags().StringVar(&util.Host, "host", "127.0.0.1", "The host of the database")
 	rootCmd.PersistentFlags().IntVar(&util.Port, "port", 4000, "The port of the database")
 	rootCmd.PersistentFlags().StringVar(&util.User, "user", "root", "The user of the database")
-	rootCmd.PersistentFlags().IntVar(&util.Thread, "thread", 4, "The number of threads to use")
+	rootCmd.PersistentFlags().IntVar(&util.Thread, "thread", 8, "The number of threads to use")
 	rootCmd.PersistentFlags().StringVar(&util.TimeStr, "time", "60s", "The duration of the test.")
 	rootCmd.PersistentFlags().BoolVar(&util.Stdout, "stdout", false, "Whether to print the result to stdout")
 

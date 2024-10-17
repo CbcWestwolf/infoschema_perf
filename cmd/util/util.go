@@ -80,24 +80,45 @@ func GetMultiConnsForExec() (chs []chan string, waitAndClose func()) {
 	return
 }
 
-func getMultiConnsForQuery(wg *sync.WaitGroup, ctx *context.Context, c *atomic.Uint64, input chan string) (waitAndClose func()) {
+func QuerySQL(getSQL func() string) {
+	var (
+		wg      sync.WaitGroup
+		counter = *atomic.NewUint64(0)
+		ctx     = context.Background()
+	)
 	db, conns, err := openMultiConns(Thread, Host, Port, User, "")
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
+	fmt.Println("Finish opening connections")
+	defer func() {
+		for _, conn := range conns {
+			conn.Close()
+		}
+		db.Close()
+	}()
 
-	if ctx == nil {
-		panic("ctx should not be nil")
+	timeout := 60 * time.Second
+	if TimeStr != "" {
+		t, err := time.ParseDuration(TimeStr)
+		if err == nil {
+			timeout = t
+		}
 	}
+	var cancel context.CancelFunc
+	fmt.Printf("Execute for %s\n", timeout.String())
+	ctx, cancel = context.WithTimeout(ctx, timeout)
+	defer cancel()
 
+	input := make(chan string)
 	for i := 0; i < Thread; i++ {
 		wg.Add(1)
 		go func(i int) {
 			defer wg.Done()
 			for {
 				select {
-				case <-(*ctx).Done():
+				case <-ctx.Done():
 					return
 				case sql, ok := <-input:
 					if !ok {
@@ -119,7 +140,7 @@ func getMultiConnsForQuery(wg *sync.WaitGroup, ctx *context.Context, c *atomic.U
 						continue
 					}
 					dest := make([]*interface{}, len(cols))
-					c.Inc()
+					counter.Inc()
 					resNum := 0
 					for rows.Next() {
 						rows.Scan(dest)
@@ -135,37 +156,6 @@ func getMultiConnsForQuery(wg *sync.WaitGroup, ctx *context.Context, c *atomic.U
 			}
 		}(i)
 	}
-	waitAndClose = func() {
-		for _, conn := range conns {
-			conn.Close()
-		}
-		db.Close()
-	}
-
-	return
-}
-
-func QuerySQL(getSQL func() string) {
-	var (
-		wg      sync.WaitGroup
-		counter = *atomic.NewUint64(0)
-		ctx     = context.Background()
-	)
-	timeout := 60 * time.Second
-	if TimeStr != "" {
-		t, err := time.ParseDuration(TimeStr)
-		if err == nil {
-			timeout = t
-		}
-	}
-	var cancel context.CancelFunc
-	fmt.Printf("Execute for %s\n", timeout.String())
-	ctx, cancel = context.WithTimeout(ctx, timeout)
-	defer cancel()
-
-	input := make(chan string)
-	clean := getMultiConnsForQuery(&wg, &ctx, &counter, input)
-	defer clean()
 
 	startTime := time.Now()
 Loop:
@@ -180,5 +170,7 @@ Loop:
 	wg.Wait()
 	close(input)
 
-	fmt.Printf("Count %d, duration %s\n", counter.Load(), time.Since(startTime).String())
+	fmt.Printf("Thread %d, Count %d, duration %s\n", Thread, counter.Load(), time.Since(startTime).String())
+	second := float64(timeout.Milliseconds()) / 1000
+	fmt.Printf("%f qps total, %f qps per thread\n", float64(counter.Load())/second, float64(counter.Load())/second/float64(Thread))
 }

@@ -37,7 +37,7 @@ var (
 const (
 	prepareDbSQL = "CREATE DATABASE IF NOT EXISTS %s_%d"
 	queryDbSQL1  = "SELECT * FROM information_schema.schemata WHERE schema_name = '%s_%d'"
-	queryDbSQL2  = "SELECT * FROM information_schema.schemata WHERE schema_name LIKE '%s%%';"
+	queryDbSQL2  = "SELECT SCHEMA_NAME FROM information_schema.schemata WHERE schema_name LIKE '%s%%';"
 )
 
 func init() {
@@ -65,7 +65,7 @@ func query1(_ *cobra.Command, _ []string) {
 
 func query2(_ *cobra.Command, _ []string) {
 	util.QuerySQL(func() string {
-		return fmt.Sprintf(queryDbSQL2, util.DatabaseNamePrefix)
+		return fmt.Sprintf(queryDbSQL2, fmt.Sprintf("%s_%d", util.DatabaseNamePrefix, rand.Intn(util.DatabaseCnt)))
 	})
 	fmt.Printf("Finish query '%s'", queryDbSQL2)
 }

@@ -64,7 +64,7 @@ func prepare(_ *cobra.Command, _ []string) {
 	chs, clean := util.GetMultiConnsForExec()
 	defer clean()
 
-	for i := 0; i < util.DatabaseCnt; i++ {
+	for i := util.DatabaseStart; i < util.DatabaseEnd; i++ {
 		chs[i%util.Thread] <- fmt.Sprintf(prepareDbSQL, util.DatabaseNamePrefix, i)
 		chs[i%util.Thread] <- fmt.Sprintf(prepareRefferedTableSQL, fmt.Sprintf("%s_%d", util.DatabaseNamePrefix, i), util.TableNamePrefix)
 		for j := 0; j < util.TableCnt; j++ {
@@ -79,7 +79,7 @@ func prepare(_ *cobra.Command, _ []string) {
 
 func query1(_ *cobra.Command, _ []string) {
 	util.QuerySQL(func() string {
-		return fmt.Sprintf(queryFkSQL1, fmt.Sprintf("%s_%d", util.DatabaseNamePrefix, rand.Intn(util.DatabaseCnt)),
+		return fmt.Sprintf(queryFkSQL1, fmt.Sprintf("%s_%d", util.DatabaseNamePrefix, rand.Intn(util.DatabaseEnd-util.DatabaseStart)+util.DatabaseStart),
 			fmt.Sprintf("%s_%d", util.TableNamePrefix, rand.Intn(util.TableCnt)),
 		)
 	})
@@ -88,7 +88,7 @@ func query1(_ *cobra.Command, _ []string) {
 
 func query2(_ *cobra.Command, _ []string) {
 	util.QuerySQL(func() string {
-		return fmt.Sprintf(queryFkSQL2, fmt.Sprintf("%s_%d", util.DatabaseNamePrefix, rand.Intn(util.DatabaseCnt)),
+		return fmt.Sprintf(queryFkSQL2, fmt.Sprintf("%s_%d", util.DatabaseNamePrefix, rand.Intn(util.DatabaseEnd-util.DatabaseStart)+util.DatabaseStart),
 			fmt.Sprintf("%s_%d", util.TableNamePrefix, rand.Intn(util.TableCnt)),
 		)
 	})
@@ -97,7 +97,7 @@ func query2(_ *cobra.Command, _ []string) {
 
 func query3(_ *cobra.Command, _ []string) {
 	util.QuerySQL(func() string {
-		return fmt.Sprintf(queryFkSQL3, fmt.Sprintf("%s_%d", util.DatabaseNamePrefix, rand.Intn(util.DatabaseCnt)),
+		return fmt.Sprintf(queryFkSQL3, fmt.Sprintf("%s_%d", util.DatabaseNamePrefix, rand.Intn(util.DatabaseEnd-util.DatabaseStart)+util.DatabaseStart),
 			fmt.Sprintf("%s_%d", util.TableNamePrefix, rand.Intn(util.TableCnt)),
 		)
 	})

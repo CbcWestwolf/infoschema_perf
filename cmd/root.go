@@ -38,7 +38,8 @@ func init_flags() {
 	rootCmd.PersistentFlags().StringVar(&util.TimeStr, "time", "60s", "The duration of the test.")
 	rootCmd.PersistentFlags().BoolVar(&util.Stdout, "stdout", false, "Whether to print the result to stdout")
 
-	rootCmd.PersistentFlags().IntVar(&util.DatabaseCnt, "db_cnt", 3, "The number of databases to create")
+	rootCmd.PersistentFlags().IntVar(&util.DatabaseStart, "db_start", 0, "The start of databases to create")
+	rootCmd.PersistentFlags().IntVar(&util.DatabaseEnd, "db_end", 3, "The end of databases to create")
 	rootCmd.PersistentFlags().StringVar(&util.DatabaseNamePrefix, "db_prefix", "info_test", "The prefix of the database name")
 }
 
@@ -49,7 +50,7 @@ var cleanCmd = &cobra.Command{
 		chs, clean := util.GetMultiConnsForExec()
 		defer clean()
 
-		for i := 0; i < util.DatabaseCnt; i++ {
+		for i := util.DatabaseStart; i < util.DatabaseEnd; i++ {
 			chs[i%util.Thread] <- fmt.Sprintf(cleanSQL, util.DatabaseNamePrefix, i)
 		}
 

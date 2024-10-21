@@ -76,7 +76,7 @@ func prepare(_ *cobra.Command, _ []string) {
 		}
 	}
 
-	for i := 0; i < util.DatabaseCnt; i++ {
+	for i := util.DatabaseStart; i < util.DatabaseEnd; i++ {
 		chs[i%util.Thread] <- fmt.Sprintf(prepareDbSQL, util.DatabaseNamePrefix, i)
 		for j := 0; j < util.TableCnt; j++ {
 			chs[i%util.Thread] <- fmt.Sprintf(prepareCheckConstraintSQL, fmt.Sprintf("%s_%d", util.DatabaseNamePrefix, i),
@@ -89,7 +89,7 @@ func prepare(_ *cobra.Command, _ []string) {
 
 func query1(_ *cobra.Command, _ []string) {
 	util.QuerySQL(func() string {
-		return fmt.Sprintf(queryCheckConstraintSQL1, fmt.Sprintf("%s_%d", util.DatabaseNamePrefix, rand.Intn(util.DatabaseCnt)),
+		return fmt.Sprintf(queryCheckConstraintSQL1, fmt.Sprintf("%s_%d", util.DatabaseNamePrefix, rand.Intn(util.DatabaseEnd-util.DatabaseStart)+util.DatabaseStart),
 			fmt.Sprintf(constraintName, fmt.Sprintf("%s_%d", util.TableNamePrefix, rand.Intn(util.TableCnt)), rand.Intn(util.ConstraintCnt)+1))
 	})
 	fmt.Printf("Finish query '%s'", queryCheckConstraintSQL1)
@@ -97,7 +97,7 @@ func query1(_ *cobra.Command, _ []string) {
 
 func query2(_ *cobra.Command, _ []string) {
 	util.QuerySQL(func() string {
-		return fmt.Sprintf(queryCheckConstraintSQL2, fmt.Sprintf("%s_%d", util.DatabaseNamePrefix, rand.Intn(util.DatabaseCnt)),
+		return fmt.Sprintf(queryCheckConstraintSQL2, fmt.Sprintf("%s_%d", util.DatabaseNamePrefix, rand.Intn(util.DatabaseEnd-util.DatabaseStart)+util.DatabaseStart),
 			fmt.Sprintf("%s_%d", util.TableNamePrefix, rand.Intn(util.TableCnt)))
 	})
 	fmt.Printf("Finish query '%s'", queryCheckConstraintSQL2)
@@ -105,7 +105,7 @@ func query2(_ *cobra.Command, _ []string) {
 
 func query3(_ *cobra.Command, _ []string) {
 	util.QuerySQL(func() string {
-		return fmt.Sprintf(queryCheckConstraintSQL3, fmt.Sprintf("%s_%d", util.DatabaseNamePrefix, rand.Intn(util.DatabaseCnt)),
+		return fmt.Sprintf(queryCheckConstraintSQL3, fmt.Sprintf("%s_%d", util.DatabaseNamePrefix, rand.Intn(util.DatabaseEnd-util.DatabaseStart)+util.DatabaseStart),
 			fmt.Sprintf("%s_%d", util.TableNamePrefix, rand.Intn(util.TableCnt)),
 			fmt.Sprintf(constraintName, fmt.Sprintf("%s_%d", util.TableNamePrefix, rand.Intn(util.TableCnt)), rand.Intn(util.ConstraintCnt)+1))
 	})

@@ -64,7 +64,7 @@ func prepare(_ *cobra.Command, _ []string) {
 	chs, clean := util.GetMultiConnsForExec()
 	defer clean()
 
-	for i := 0; i < util.DatabaseCnt; i++ {
+	for i := util.DatabaseStart; i < util.DatabaseEnd; i++ {
 		chs[i%util.Thread] <- fmt.Sprintf(prepareDbSQL, util.DatabaseNamePrefix, i)
 		for j := 0; j < util.TableCnt; j++ {
 			chs[i%util.Thread] <- fmt.Sprintf(preparePartitionSQL, fmt.Sprintf("%s_%d", util.DatabaseNamePrefix, i),
@@ -77,7 +77,7 @@ func prepare(_ *cobra.Command, _ []string) {
 
 func query1(_ *cobra.Command, _ []string) {
 	util.QuerySQL(func() string {
-		return fmt.Sprintf(queryPartitionSQL1, fmt.Sprintf("%s_%d", util.DatabaseNamePrefix, rand.Intn(util.DatabaseCnt)),
+		return fmt.Sprintf(queryPartitionSQL1, fmt.Sprintf("%s_%d", util.DatabaseNamePrefix, rand.Intn(util.DatabaseEnd-util.DatabaseStart)+util.DatabaseStart),
 			fmt.Sprintf("%s_%d", util.TableNamePrefix, rand.Intn(util.TableCnt)))
 	})
 	fmt.Printf("Finish query '%s'", queryPartitionSQL1)
@@ -85,7 +85,7 @@ func query1(_ *cobra.Command, _ []string) {
 
 func query2(_ *cobra.Command, _ []string) {
 	util.QuerySQL(func() string {
-		return fmt.Sprintf(queryPartitionSQL2, fmt.Sprintf("%s_%d", util.DatabaseNamePrefix, rand.Intn(util.DatabaseCnt)))
+		return fmt.Sprintf(queryPartitionSQL2, fmt.Sprintf("%s_%d", util.DatabaseNamePrefix, rand.Intn(util.DatabaseEnd-util.DatabaseStart)+util.DatabaseStart))
 	})
 	fmt.Printf("Finish query '%s'", queryPartitionSQL2)
 }

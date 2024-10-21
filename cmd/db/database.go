@@ -49,7 +49,7 @@ func prepare(_ *cobra.Command, _ []string) {
 	chs, clean := util.GetMultiConnsForExec()
 	defer clean()
 
-	for i := 0; i < util.DatabaseCnt; i++ {
+	for i := util.DatabaseStart; i < util.DatabaseEnd; i++ {
 		sql := fmt.Sprintf(prepareDbSQL, util.DatabaseNamePrefix, i)
 		chs[i%util.Thread] <- sql
 	}
@@ -58,14 +58,14 @@ func prepare(_ *cobra.Command, _ []string) {
 
 func query1(_ *cobra.Command, _ []string) {
 	util.QuerySQL(func() string {
-		return fmt.Sprintf(queryDbSQL1, util.DatabaseNamePrefix, rand.Intn(util.DatabaseCnt))
+		return fmt.Sprintf(queryDbSQL1, util.DatabaseNamePrefix, rand.Intn(util.DatabaseEnd-util.DatabaseStart)+util.DatabaseStart)
 	})
 	fmt.Printf("Finish query '%s'", queryDbSQL1)
 }
 
 func query2(_ *cobra.Command, _ []string) {
 	util.QuerySQL(func() string {
-		return fmt.Sprintf(queryDbSQL2, fmt.Sprintf("%s_%d", util.DatabaseNamePrefix, rand.Intn(util.DatabaseCnt)))
+		return fmt.Sprintf(queryDbSQL2, fmt.Sprintf("%s_%d", util.DatabaseNamePrefix, rand.Intn(util.DatabaseEnd-util.DatabaseStart)+util.DatabaseStart))
 	})
 	fmt.Printf("Finish query '%s'", queryDbSQL2)
 }

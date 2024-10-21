@@ -29,13 +29,14 @@ Available Commands:
   view        Prepare and test view
 
 Flags:
-      --db_cnt int         The number of databases to create (default 3)
+      --db_end int         The end of databases to create (default 3)
       --db_prefix string   The prefix of the database name (default "info_test")
+      --db_start int       The start of databases to create
   -h, --help               help for infoschema_perf
       --host string        The host of the database (default "127.0.0.1")
       --port int           The port of the database (default 4000)
       --stdout             Whether to print the result to stdout
-      --thread int         The number of threads to use (default 4)
+      --thread int         The number of threads to use (default 8)
       --time string        The duration of the test. (default "60s")
       --user string        The user of the database (default "root")
 

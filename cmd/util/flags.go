@@ -6,7 +6,8 @@ var (
 	User   string
 	Thread int
 
-	DatabaseCnt        int
+	DatabaseStart      int
+	DatabaseEnd        int
 	DatabaseNamePrefix string
 
 	TableCnt        int

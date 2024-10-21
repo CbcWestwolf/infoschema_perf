@@ -129,7 +129,7 @@ func prepare(_ *cobra.Command, _ []string) {
 		}
 	}
 
-	for i := 0; i < util.DatabaseCnt; i++ {
+	for i := util.DatabaseStart; i < util.DatabaseEnd; i++ {
 		chs[i%util.Thread] <- fmt.Sprintf(prepareDbSQL, util.DatabaseNamePrefix, i)
 		for j := 0; j < util.TableCnt; j++ {
 			chs[i%util.Thread] <- fmt.Sprintf(prepareTableSQL, fmt.Sprintf("%s_%d", util.DatabaseNamePrefix, i),
@@ -142,7 +142,7 @@ func prepare(_ *cobra.Command, _ []string) {
 
 func query1(_ *cobra.Command, _ []string) {
 	util.QuerySQL(func() string {
-		return fmt.Sprintf(queryIndexSQL1, fmt.Sprintf("%s_%d", util.DatabaseNamePrefix, rand.Intn(util.DatabaseCnt)),
+		return fmt.Sprintf(queryIndexSQL1, fmt.Sprintf("%s_%d", util.DatabaseNamePrefix, rand.Intn(util.DatabaseEnd-util.DatabaseStart)+util.DatabaseStart),
 			fmt.Sprintf("%s_%d", util.TableNamePrefix, rand.Intn(util.TableCnt)))
 	})
 	fmt.Printf("Finish query '%s'", queryIndexSQL1)
@@ -150,7 +150,7 @@ func query1(_ *cobra.Command, _ []string) {
 
 func query2(_ *cobra.Command, _ []string) {
 	util.QuerySQL(func() string {
-		return fmt.Sprintf(queryIndexSQL2, fmt.Sprintf("%s_%d", util.DatabaseNamePrefix, rand.Intn(util.DatabaseCnt)),
+		return fmt.Sprintf(queryIndexSQL2, fmt.Sprintf("%s_%d", util.DatabaseNamePrefix, rand.Intn(util.DatabaseEnd-util.DatabaseStart)+util.DatabaseStart),
 			fmt.Sprintf("%s_%d", util.TableNamePrefix, rand.Intn(util.TableCnt)))
 	})
 	fmt.Printf("Finish query '%s'", queryIndexSQL2)
@@ -158,7 +158,7 @@ func query2(_ *cobra.Command, _ []string) {
 
 func query3(_ *cobra.Command, _ []string) {
 	util.QuerySQL(func() string {
-		return fmt.Sprintf(queryIndexSQL3, fmt.Sprintf("%s_%d", util.DatabaseNamePrefix, rand.Intn(util.DatabaseCnt)),
+		return fmt.Sprintf(queryIndexSQL3, fmt.Sprintf("%s_%d", util.DatabaseNamePrefix, rand.Intn(util.DatabaseEnd-util.DatabaseStart)+util.DatabaseStart),
 			fmt.Sprintf("%s_%d", util.TableNamePrefix, rand.Intn(util.TableCnt)))
 	})
 	fmt.Printf("Finish query '%s'", queryIndexSQL3)
@@ -166,7 +166,7 @@ func query3(_ *cobra.Command, _ []string) {
 
 func query4(_ *cobra.Command, _ []string) {
 	util.QuerySQL(func() string {
-		return fmt.Sprintf(queryIndexSQL4, fmt.Sprintf("%s_%d", util.DatabaseNamePrefix, rand.Intn(util.DatabaseCnt)),
+		return fmt.Sprintf(queryIndexSQL4, fmt.Sprintf("%s_%d", util.DatabaseNamePrefix, rand.Intn(util.DatabaseEnd-util.DatabaseStart)+util.DatabaseStart),
 			fmt.Sprintf("%s_%d", util.TableNamePrefix, rand.Intn(util.TableCnt)),
 			fmt.Sprintf("%s_%d", util.IndexNamePrefix, rand.Intn(util.IndexCnt)))
 	})
@@ -175,7 +175,7 @@ func query4(_ *cobra.Command, _ []string) {
 
 func query5(_ *cobra.Command, _ []string) {
 	util.QuerySQL(func() string {
-		return fmt.Sprintf(queryIndexSQL5, fmt.Sprintf("%s_%d", util.DatabaseNamePrefix, rand.Intn(util.DatabaseCnt)),
+		return fmt.Sprintf(queryIndexSQL5, fmt.Sprintf("%s_%d", util.DatabaseNamePrefix, rand.Intn(util.DatabaseEnd-util.DatabaseStart)+util.DatabaseStart),
 			fmt.Sprintf("%s_%d", util.TableNamePrefix, rand.Intn(util.TableCnt)))
 	})
 	fmt.Printf("Finish query '%s'", queryIndexSQL5)
@@ -183,7 +183,7 @@ func query5(_ *cobra.Command, _ []string) {
 
 func query6(_ *cobra.Command, _ []string) {
 	util.QuerySQL(func() string {
-		return fmt.Sprintf(queryIndexSQL6, fmt.Sprintf("%s_%d", util.DatabaseNamePrefix, rand.Intn(util.DatabaseCnt)),
+		return fmt.Sprintf(queryIndexSQL6, fmt.Sprintf("%s_%d", util.DatabaseNamePrefix, rand.Intn(util.DatabaseEnd-util.DatabaseStart)+util.DatabaseStart),
 			fmt.Sprintf("%s_%d", util.TableNamePrefix, rand.Intn(util.TableCnt)))
 	})
 	fmt.Printf("Finish query '%s'", queryIndexSQL6)
@@ -191,7 +191,7 @@ func query6(_ *cobra.Command, _ []string) {
 
 func query7(_ *cobra.Command, _ []string) {
 	util.QuerySQL(func() string {
-		return fmt.Sprintf(queryIndexSQL7, fmt.Sprintf("%s_%d", util.DatabaseNamePrefix, rand.Intn(util.DatabaseCnt)),
+		return fmt.Sprintf(queryIndexSQL7, fmt.Sprintf("%s_%d", util.DatabaseNamePrefix, rand.Intn(util.DatabaseEnd-util.DatabaseStart)+util.DatabaseStart),
 			fmt.Sprintf("%s_%d", util.TableNamePrefix, rand.Intn(util.TableCnt)))
 	})
 	fmt.Printf("Finish query '%s'", queryIndexSQL7)
@@ -199,7 +199,7 @@ func query7(_ *cobra.Command, _ []string) {
 
 func query8(_ *cobra.Command, _ []string) {
 	util.QuerySQL(func() string {
-		return fmt.Sprintf(queryIndexSQL8, fmt.Sprintf("%s_%d", util.DatabaseNamePrefix, rand.Intn(util.DatabaseCnt)),
+		return fmt.Sprintf(queryIndexSQL8, fmt.Sprintf("%s_%d", util.DatabaseNamePrefix, rand.Intn(util.DatabaseEnd-util.DatabaseStart)+util.DatabaseStart),
 			fmt.Sprintf("%s_%d", util.TableNamePrefix, rand.Intn(util.TableCnt)))
 	})
 	fmt.Printf("Finish query '%s'", queryIndexSQL8)

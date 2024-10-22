@@ -38,7 +38,7 @@ var (
 const (
 	prepareDbSQL    = "CREATE DATABASE IF NOT EXISTS %s_%d"
 	prepareTableSQL = "CREATE TABLE IF NOT EXISTS %s.%s (id int primary key, name varchar(255));"
-	queryTableSQL1  = "SELECT * FROM information_schema.tables WHERE TABLE_SCHEMA NOT IN (%s) limit 10000;"
+	queryTableSQL1  = "SELECT TABLE_SCHEMA, TABLE_NAME FROM information_schema.tables WHERE TABLE_SCHEMA NOT IN (%s) limit 10000;"
 	queryTableSQL2  = "SELECT * FROM information_schema.tables WHERE TABLE_SCHEMA = '%s' AND TABLE_NAME = '%s';"
 )
 

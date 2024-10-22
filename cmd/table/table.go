@@ -5,6 +5,7 @@ import (
 	"infoschema_perf/cmd/util"
 	"math/rand"
 	"strings"
+	"time"
 
 	"github.com/spf13/cobra"
 )
@@ -37,7 +38,7 @@ var (
 
 const (
 	prepareDbSQL    = "CREATE DATABASE IF NOT EXISTS %s_%d"
-	prepareTableSQL = "CREATE TABLE IF NOT EXISTS %s.%s (id int primary key, name varchar(255));"
+	prepareTableSQL = "CREATE TABLE IF NOT EXISTS %s.%s (id int primary key, name varchar(255)) COMMENT '%s';"
 	queryTableSQL1  = "SELECT TABLE_SCHEMA, TABLE_NAME FROM information_schema.tables WHERE TABLE_SCHEMA NOT IN (%s) limit 10000;"
 	queryTableSQL2  = "SELECT * FROM information_schema.tables WHERE TABLE_SCHEMA = '%s' AND TABLE_NAME = '%s';"
 )
@@ -66,11 +67,27 @@ func prepare(_ *cobra.Command, _ []string) {
 	for i := util.DatabaseStart; i < util.DatabaseEnd; i++ {
 		for j := 0; j < util.TableCnt; j++ {
 			chs[(i+j)%util.Thread] <- fmt.Sprintf(prepareTableSQL, fmt.Sprintf("%s_%d", util.DatabaseNamePrefix, i),
-				fmt.Sprintf("%s_%d", util.TableNamePrefix, j))
+				fmt.Sprintf("%s_%d", util.TableNamePrefix, j),
+				genRandomComment())
 		}
 	}
 
 	fmt.Println("Finish prepare tables")
+}
+
+func genRandomComment() string {
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+
+	chars := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+
+	length := r.Intn(2049) // 0 ~ 2048
+
+	res := make([]byte, 0, length)
+	for i := 0; i < length; i++ {
+		res = append(res, chars[r.Intn(len(chars))])
+	}
+
+	return string(res)
 }
 
 func generateTableList() string {

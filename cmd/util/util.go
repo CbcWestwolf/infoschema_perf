@@ -170,7 +170,8 @@ Loop:
 	wg.Wait()
 	close(input)
 
-	fmt.Printf("Thread %d, Count %d, duration %s\n", Thread, counter.Load(), time.Since(startTime).String())
+	fmt.Printf("%d thread(s), query executed %d times, total duration %s\n", Thread, counter.Load(), time.Since(startTime).String())
+	fmt.Printf("%fms duration for average\n", float64(timeout.Milliseconds())/float64(counter.Load()/uint64(Thread)))
 	second := float64(timeout.Milliseconds()) / 1000
 	fmt.Printf("%f qps total, %f qps per thread\n", float64(counter.Load())/second, float64(counter.Load())/second/float64(Thread))
 }

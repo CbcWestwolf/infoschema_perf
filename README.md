@@ -36,7 +36,7 @@ Flags:
       --host string        The host of the database (default "127.0.0.1")
       --port int           The port of the database (default 4000)
       --stdout             Whether to print the result to stdout
-      --thread int         The number of threads to use (default 8)
+      --thread int         The number of threads to use (default 1)
       --time string        The duration of the test. (default "60s")
       --user string        The user of the database (default "root")
 

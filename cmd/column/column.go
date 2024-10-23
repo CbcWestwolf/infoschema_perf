@@ -5,6 +5,7 @@ import (
 	"infoschema_perf/cmd/util"
 	"math/rand"
 	"strings"
+	"time"
 
 	"github.com/spf13/cobra"
 )
@@ -76,8 +77,13 @@ func prepare(_ *cobra.Command, _ []string) {
 
 	for i := util.DatabaseStart; i < util.DatabaseEnd; i++ {
 		chs[i%util.Thread] <- fmt.Sprintf(prepareDbSQL, util.DatabaseNamePrefix, i)
+	}
+
+	time.Sleep(2 * time.Second)
+
+	for i := util.DatabaseStart; i < util.DatabaseEnd; i++ {
 		for j := 0; j < util.TableCnt; j++ {
-			chs[i%util.Thread] <- fmt.Sprintf(prepareColumnSQL, fmt.Sprintf("%s_%d", util.DatabaseNamePrefix, i),
+			chs[(i+j)%util.Thread] <- fmt.Sprintf(prepareColumnSQL, fmt.Sprintf("%s_%d", util.DatabaseNamePrefix, i),
 				fmt.Sprintf("%s_%d", util.TableNamePrefix, j), sb.String())
 		}
 	}

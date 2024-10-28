@@ -18,6 +18,8 @@ var (
 	ColumnNamePrefix string
 	ConstraintCnt    int
 
+	PartitionCnt int
+
 	IndexCnt        int
 	IndexNamePrefix string
 	UniqueCnt       int

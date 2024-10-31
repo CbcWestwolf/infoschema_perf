@@ -26,4 +26,6 @@ var (
 
 	Stdout  bool
 	TimeStr string
+
+	SkipPrepareDB bool
 )

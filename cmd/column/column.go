@@ -54,6 +54,7 @@ func init_flags() {
 	ColumnCmd.PersistentFlags().StringVar(&util.TableNamePrefix, "table_prefix", "t", "The prefix of the table name")
 	ColumnCmd.PersistentFlags().IntVar(&util.ColumnCnt, "column_cnt", 5, "The number of columns to create")
 	ColumnCmd.PersistentFlags().StringVar(&util.ColumnNamePrefix, "column_prefix", "c", "The prefix of the column name")
+	ColumnCmd.PersistentFlags().BoolVar(&util.SkipPrepareDB, "skip_prepare_db", false, "Skip prepare database")
 }
 
 func init() {
@@ -75,11 +76,12 @@ func prepare(_ *cobra.Command, _ []string) {
 		}
 	}
 
-	for i := util.DatabaseStart; i < util.DatabaseEnd; i++ {
-		chs[i%util.Thread] <- fmt.Sprintf(prepareDbSQL, util.DatabaseNamePrefix, i)
+	if !util.SkipPrepareDB {
+		for i := util.DatabaseStart; i < util.DatabaseEnd; i++ {
+			chs[i%util.Thread] <- fmt.Sprintf(prepareDbSQL, util.DatabaseNamePrefix, i)
+		}
+		time.Sleep(2 * time.Second)
 	}
-
-	time.Sleep(2 * time.Second)
 
 	for i := util.DatabaseStart; i < util.DatabaseEnd; i++ {
 		for j := 0; j < util.TableCnt; j++ {
